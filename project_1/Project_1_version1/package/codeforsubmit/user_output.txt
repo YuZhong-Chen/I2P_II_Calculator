@@ -1,0 +1,12 @@
+MOV r6 1
+MOV [12] r6
+MOV r6 [12]
+MOV [0] r6
+MOV r3 [0]
+MOV [12] r3
+MOV r6 [12]
+MOV [0] r6
+MOV r0 [0]
+MOV r1 [4]
+MOV r2 [8]
+EXIT 0
