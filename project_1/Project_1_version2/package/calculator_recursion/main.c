@@ -30,10 +30,11 @@
 
 int main()
 {
-    // freopen("input.txt", "r", stdin);
+    freopen("user_input.txt", "r", stdin);
+    freopen("user_output.txt", "w", stdout);
 
     initTable();
-    printf(">> ");
+
     while (1)
     {
         statement();

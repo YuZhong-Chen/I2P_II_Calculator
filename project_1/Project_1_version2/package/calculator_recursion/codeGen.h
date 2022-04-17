@@ -3,6 +3,20 @@
 
 #include "parser.h"
 
+typedef struct
+{
+    int isTemp;
+    int isConst;
+    int isUse;
+    int val;
+} Memory;
+
+extern Memory memory[80];
+
+extern int getSpace(int Temp, int Const, int Value);
+
+extern void freeSpace(int address);
+
 // Evaluate the syntax tree
 extern int evaluateTree(BTNode *root);
 

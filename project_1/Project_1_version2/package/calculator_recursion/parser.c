@@ -4,48 +4,62 @@
 #include <stdlib.h>
 #include <string.h>
 
+int sbcount = 0;
 Symbol table[TBLSIZE];
 
 void initTable(void)
 {
+    for (int i = 0; i < 80; i++)
+    {
+        memory[i].isTemp = memory[i].isUse = memory[i].isConst = memory[i].val = 0;
+    }
+
     strcpy(table[0].name, "x");
-    table[0].val = 0;
+    table[0].address = getSpace(0, 0, 0);
+
     strcpy(table[1].name, "y");
-    table[1].val = 0;
+    table[1].address = getSpace(0, 0, 0);
+
     strcpy(table[2].name, "z");
-    table[2].val = 0;
+    table[2].address = getSpace(0, 0, 0);
+
     sbcount = 3;
 }
 
-int getval(char *str)
+int getadd(char *str)
 {
     int i = 0;
 
     for (i = 0; i < sbcount; i++)
-        if (strcmp(str, table[i].name) == 0)
-            return table[i].val;
+        if (!strcmp(str, table[i].name))
+            return table[i].address;
 
     if (sbcount >= TBLSIZE)
         error(RUNOUT);
 
     error(SYNTAXERR);
 
-    strcpy(table[sbcount].name, str);
-    table[sbcount].val = 0;
-    sbcount++;
     return 0;
 }
 
-int setval(char *str, int val)
+int setadd(char *str, int add)
 {
     int i = 0;
 
     for (i = 0; i < sbcount; i++)
     {
-        if (strcmp(str, table[i].name) == 0)
+        if (!strcmp(str, table[i].name))
         {
-            table[i].val = val;
-            return val;
+            if (add >= 65)
+            {
+                printf("MOV [%d] r%d\n", table[i].address * 4, add - 65);
+            }
+            else
+            {
+                printf("MOV r6 [%d]\n", add * 4);
+                printf("MOV [%d] r6\n", table[i].address * 4);
+            }
+            return add;
         }
     }
 
@@ -53,9 +67,19 @@ int setval(char *str, int val)
         error(RUNOUT);
 
     strcpy(table[sbcount].name, str);
-    table[sbcount].val = val;
+    table[sbcount].address = getSpace(0, 0, 0);
+    if (add >= 65)
+    {
+        printf("MOV [%d] r%d\n", table[sbcount].address * 4, add - 65);
+    }
+    else
+    {
+        printf("MOV r6 [%d]\n", add * 4);
+        printf("MOV [%d] r6\n", table[sbcount].address * 4);
+    }
+
     sbcount++;
-    return val;
+    return add;
 }
 
 BTNode *makeNode(TokenSet tok, const char *lexe)
@@ -86,17 +110,14 @@ void statement(void)
 
     if (match(ENDFILE))
     {
-        printf("\n");
-        for (int i = 0; i < 3; i++)
-        {
-            printf("%s = %d\n", table[i].name, table[i].val);
-        }
-
+        printf("MOV r0 [0]\n");
+        printf("MOV r1 [4]\n");
+        printf("MOV r2 [8]\n");
+        printf("EXIT 0\n");
         exit(0);
     }
     else if (match(END))
     {
-        printf(">> ");
         advance();
     }
     else
@@ -104,12 +125,18 @@ void statement(void)
         retp = assign_expr();
         if (match(END))
         {
-            printf("%d\n", evaluateTree(retp));
-            printf("Prefix traversal: ");
-            printPrefix(retp);
-            printf("\n");
+            evaluateTree(retp);
+
+            // printf("Prefix traversal: ");
+            // printPrefix(retp);
+            // printf("\n\n");
+
             freeTree(retp);
-            printf(">> ");
+            for (int i = 0; i < 80; i++)
+            {
+                if (memory[i].isTemp)
+                    freeSpace(i);
+            }
             advance();
         }
         else
@@ -358,5 +385,6 @@ void err(ErrorType errorNum)
             break;
         }
     }
+    printf("EXIT 1\n");
     exit(0);
 }

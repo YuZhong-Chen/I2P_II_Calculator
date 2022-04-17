@@ -6,7 +6,7 @@
 
 // Set PRINTERR to 1 to print error message while calling error()
 // Make sure you set PRINTERR to 0 before you submit your code
-#define PRINTERR 1
+#define PRINTERR 0
 
 // Call this macro to print error message and exit the program
 // This will also print where you called it in your program
@@ -35,6 +35,7 @@ typedef struct
 {
     int val;
     char name[MAXLEN];
+    int address;
 } Symbol;
 
 // Structure of a tree node
@@ -47,7 +48,7 @@ typedef struct _Node
     struct _Node *right;
 } BTNode;
 
-int sbcount = 0;
+extern int sbcount;
 
 // The symbol table
 extern Symbol table[TBLSIZE];
@@ -56,10 +57,10 @@ extern Symbol table[TBLSIZE];
 extern void initTable(void);
 
 // Get the value of a variable
-extern int getval(char *str);
+extern int getadd(char *str);
 
 // Set the value of a variable
-extern int setval(char *str, int val);
+extern int setadd(char *str, int add);
 
 // Make a new node according to token type and lexeme
 extern BTNode *makeNode(TokenSet tok, const char *lexe);
